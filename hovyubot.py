@@ -35,9 +35,9 @@ while 1:
                     address = store['address']
                     distance_klm = store['distance_klm']
                     if distance_klm < 1:
-                        time_bike = '{0} minutos en bicicleta'.format(int(round(180/distance_klm)))
-                    else:
                         time_bike = '{0} minutos a pie'.format(int(round(distance_klm*9)))
+                    else:
+                        time_bike = '{0} minutos en bicicleta'.format(int(round(180/distance_klm)))
                     if address == '':
                         address = '(No recuerdo la dirección 😶, deberás preguntar en el barrio)'
                     msg = '{0}"{1}"\n{2}\n{3}\n{4}\n\n'.format(msg, name, description, address, time_bike)
