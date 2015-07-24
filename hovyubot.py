@@ -34,10 +34,13 @@ while 1:
                     description =  store['description']
                     address = store['address']
                     distance_klm = store['distance_klm']
-                    time_bike = int(round(distance_klm))
+                    if distance_klm < 1:
+                        time_bike = '{0} minutos en bicicleta'.format(int(round(180/distance_klm)))
+                    else:
+                        time_bike = '{0} minutos a pie'.format(int(round(distance_klm*9)))
                     if address == '':
                         address = '(No recuerdo la dirección 😶, deberás preguntar en el barrio)'
-                    msg = '{0}"{1}"\n{2}\n{3}\n{4} min en bicicleta\n\n'.format(msg, name, description, address, time_bike)
+                    msg = '{0}"{1}"\n{2}\n{3}\n{4}\n\n'.format(msg, name, description, address, time_bike)
         if 'text' in result['message']:
             if result['message']['text']:
                 msg = 'Hola! Si me envías tu hubicación te puedo decir que comercios verdes hay por tu zona.\n Si quieres sumar un comercio o necesitas ayuda te invito a unirte a mi grupo:\nhttps://telegram.me/joinchat/0338811e00225f1561463d99065a12d7'
