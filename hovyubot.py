@@ -33,9 +33,10 @@ while 1:
                     name = store['name']
                     description =  store['description']
                     address = store['address']
+                    distance_klm = store['distance_klm']
                     if address == '':
                         address = '(No recuerdo la dirección 😶, deberás preguntar en el barrio)'
-                    msg = '{0}"{1}"\n{2}\n{3}\n\n'.format(msg, name, description, address)
+                    msg = '{0}"{1}"\n{2}\n{3}\n{4} Km.\n\n'.format(msg, name, description, address, distance_klm)
         if 'text' in result['message']:
             if result['message']['text']:
                 msg = 'Hola! Si me envías tu hubicación te puedo decir que comercios verdes hay por tu zona.\n Si quieres sumar un comercio o necesitas ayuda te invito a unirte a mi grupo:\nhttps://telegram.me/joinchat/0338811e00225f1561463d99065a12d7'
