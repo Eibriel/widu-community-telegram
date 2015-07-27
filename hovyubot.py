@@ -1,20 +1,26 @@
-#!/bin/python3
-
 import json
 import random
 import requests
-from config import Config
 
+from bson import ObjectId
+from config import Config
+from pymongo import MongoClient
 from board_hello import board_hello
 
+
 class bot:
-    last_update = 0
+    #last_update = 0
+    #infers = []
+
     bot_token = Config.bot_token
     server_url = Config.server_url
 
-    last = ''
-
-    infers = []
+    def __init__ (self):
+        client = MongoClient()
+        db = client.emonitor
+        self.db_settings = db.hovyubot_settings
+        self.db_users = db.hovyubot_users
+        #self.db_chats = db.hovyubot_chats
 
     def send_to_bot(self, access_point, data=None):
         try:
@@ -32,9 +38,52 @@ class bot:
             return None
         return r
 
+    def get_last_update(self):
+        settings = self.db_settings.find()
+        if settings.count() == 0:
+            settings = {
+                'last_update': 0
+            }
+            self.db_settings.insert(settings)
+            return 0
+        else:
+            #print (settings[0])
+            return settings[0]['last_update']
+
+
+    def set_last_update(self, number):
+        settings = {
+            'last_update': number
+        }
+        settings_db = self.db_settings.find()[0]
+        if settings_db:
+            self.db_settings.update({'_id': settings_db['_id']}, {'$set': settings})
+            return True
+        else:
+            return False
+
+
+    def get_infer(self, user_id):
+        user_db = self.db_settings.find_one({'tid': user_id})
+        if user_db:
+            return user_db['infers']
+        else:
+            return False
+
+
+    def set_infer(self, user_id, infer):
+        if type(infer) != list:
+            return False
+        user_db = self.db_settings.find_one({'tid': user_id})
+        if not user_db:
+            self.db_settings.insert({'tid': user_id, 'infers': infer})
+            return True
+        infers = list(set(user_db['infers'] + infer))
+        self.db_settings.update({'_id': user_db['_id']}, {'$set': {'infers': infers}})
+
     def bot_loop(self):
         while 1:
-            r = self.send_to_bot('getUpdates?timeout=30&offset={0}'.format(self.last_update))
+            r = self.send_to_bot('getUpdates?timeout=30&offset={0}'.format(self.get_last_update()+1))
             if not r:
                 continue
             r_json = r.json()
@@ -48,8 +97,8 @@ class bot:
                 if_not = None
                 keys = []
 
-                if result['update_id'] >= self.last_update:
-                    self.last_update = result['update_id'] + 1
+                if result['update_id'] >= self.get_last_update():
+                    self.set_last_update (result['update_id'])
                 chat_id = result['message']['chat']['id']
 
                 # Location:
@@ -101,7 +150,7 @@ class bot:
                             break
                     #print (infer)
                     if infer:
-                        self.infers = list(set(self.infers + infer))
+                        self.set_infer(result['message']['from']['id'], infer)
                     #print (self.infers)
                     if children:
                         children_name = random.choice(children) # TODO No Random
@@ -112,7 +161,9 @@ class bot:
                         msgs = random.choice(child['text'])
                         if 'infer' in child:
                             infer = node['infer']
-                            self.infers = list(set(self.infers + infer))
+                            #self.infers = list(set(self.infers + infer))
+                            self.set_infer(result['message']['from']['id'], infer)
+                        infers = self.get_infer(result['message']['from']['id'])
                         if 'children' in child:
                             for second_child in child['children']:
                                 for node in board_hello['nodes']:
@@ -122,13 +173,13 @@ class bot:
                                             #print (node['if_not'])
                                             #print (self.infers)
                                             for not_ in node['if_not']:
-                                                if not_ in self.infers:
+                                                if not_ in infers:
                                                     dont_show = True
                                                     break
                                         show = False
                                         if 'if' in node:
                                             for yes in node['if']:
-                                                if yes in self.infers:
+                                                if yes in infers:
                                                     show = True
                                                     break
                                         else:
