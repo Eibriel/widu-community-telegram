@@ -87,7 +87,10 @@ class bot:
 
     def bot_loop(self):
         while 1:
-            r = self.send_to_bot('getUpdates?timeout=30&offset={0}'.format(self.get_last_update()+1))
+            last_update = self.get_last_update()
+            if last_update != 0:
+                last_update = last_update + 1
+            r = self.send_to_bot('getUpdates?timeout=30&offset={0}'.format(last_update))
             if not r:
                 continue
             r_json = r.json()
