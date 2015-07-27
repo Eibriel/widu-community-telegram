@@ -1,3 +1,17 @@
+main = [
+    'who_are_you',
+    'what_is_hovyu',
+    'what_is_sustainable',
+    'where_cani_find_sustainable_stores',
+    'i_know_a_sustainable_store',
+    'tell_me_more_about_sustainibility'
+]
+
+more_sustainibility = [
+    'but_the_world_is_full_of_resources',
+    'we_can_talk_later'
+]
+
 board_hello = {
     'name': 'hello',
     'triggers': ['first_hi'],
@@ -11,7 +25,7 @@ board_hello = {
         {
             'name': 'hello',
             'text': [['¡Hola!']],
-            'children': ['who_are_you', 'what_is_hovyu', 'what_is_sustainable', 'where_cani_find_sustainable_stores', 'i_know_a_sustainable_store']
+            'children': main
         },
         {
             'name': 'who_are_you',
@@ -29,13 +43,13 @@ board_hello = {
         {
             'name': 'i_am_hovyu',
             'text': [['Soy Hovyũ, un bot verde', 'me interesa la sostenibilidad', 'si a vos también te interesa podemos charlar!']],
-            'children': ['what_is_hovyu', 'what_is_sustainable', 'where_cani_find_sustainable_stores', 'i_know_a_sustainable_store'],
+            'children': main,
             'infer': ['know_hovyubot']
         },
         {
             'name': 'hovyu_means',
             'text': [['Hovyũ significa Verde en guaraní', 'se pronuncia Hoviú o Hovuú']],
-            'children': ['who_are_you', 'what_is_sustainable', 'where_cani_find_sustainable_stores', 'i_know_a_sustainable_store'],
+            'children': main,
             'infer': ['know_hovyu']
         },
         {
@@ -80,7 +94,7 @@ board_hello = {
                     'Enviame tu hubicación y te digo que comercios verdes hay por tu zona'
                 ]
             ],
-            'children': ['i_understand']
+            'children': ['i_understand_sustainibility']
         },
         {
             'name': 'great_join_the_group_and_comment_it',
@@ -90,6 +104,12 @@ board_hello = {
                 ]
             ],
             'children': ['i_understand']
+        },
+        {
+            'name': 'i_understand_sustainibility',
+            'text': [['¡Entendido!']],
+            'children': ['great'],
+            'infer': ['know_sustainability']
         },
         {
             'name': 'i_understand',
@@ -111,14 +131,44 @@ board_hello = {
         {
             'name': 'great',
             'text': [['¡Genial!'], ['¡Perfecto!']],
-            'children': ['who_are_you', 'what_is_hovyu', 'what_is_sustainable', 'where_cani_find_sustainable_stores', 'i_know_a_sustainable_store']
+            'children': main
         },
         {
             'name': 'dont_mok_me',
             'text': [['¡No te burles! 😡'], ['Si... seguro... 😒']],
-            'children': ['who_are_you', 'what_is_hovyu', 'what_is_sustainable', 'where_cani_find_sustainable_stores', 'i_know_a_sustainable_store']
-        }
+            'children': main
+        },
 
+        {
+            'name': 'tell_me_more_about_sustainibility',
+            'text': [['Cuéntame mas acerca de sostenibilidad']],
+            'children': ['more_sustainibility'],
+            'if': ['know_sustainability']
+        },
+        {
+            'name': 'more_sustainibility',
+            'text': [['Necesitamos cambiar nuestra mentalidad, los modelos actuales están dejando ver sus fallas',
+                'la población mundial crece en forma exponencial, y hay que pensar como dividirnos los recursos de la mejor manera posible',
+                'pero ese cambio comienza por uno mismo, derrochar ya pasó de moda 😉'
+            ]],
+            'children': more_sustainibility,
+        },
+        {
+            'name': 'we_can_talk_later',
+            'text': [['Después seguimos hablando']],
+            'children': ['great']
+        },
+        {
+            'name': 'but_the_world_is_full_of_resources',
+            'text': [['Pero el mundo está lleno de recursos!']],
+            'children': ['we_need_to_manage_them_properly']
+        },
+        {
+            'name': 'we_need_to_manage_them_properly',
+            'text': [['Pero si se derrochan se van a terminar antes de que puedan recuperarse naturalmente',
+                'de hecho actualmente en el mundo se consume en 6 meses los recursos de 1 año.']],
+            'children': more_sustainibility
+        }
 
     ]
 }
