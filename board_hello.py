@@ -91,7 +91,7 @@ board_hello = {
             'name': 'send_me_your_location_and_i_tell_you_green_stores_in_the_zone',
             'text': [
                 [
-                    'Enviame tu hubicación y te digo que comercios verdes hay por tu zona'
+                    'Enviame tu ubicación y te digo que comercios verdes hay por tu zona'
                 ]
             ],
             'children': ['i_understand_sustainibility']
