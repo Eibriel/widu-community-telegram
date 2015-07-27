@@ -86,7 +86,7 @@ board_hello = {
             'name': 'great_join_the_group_and_comment_it',
             'text': [
                 [
-                    'Genial! Unite al grupo https://telegram.me/joinchat/0338811e00225f1561463d99065a12d7 y comentálo!'
+                    'Genial! Unite al grupo https://telegram.me/joinchat/0338811e00225f1561463d99065a12d7 y comentalo!'
                 ]
             ],
             'children': ['i_understand']
