@@ -1,2 +1,7 @@
 hovyubot:
     build: .
+    links:
+     - dbhovyubot
+
+dbhovyubot:
+    image: mongo:latest
