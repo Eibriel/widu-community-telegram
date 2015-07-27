@@ -1,3 +1,4 @@
+import os
 import json
 import random
 import requests
@@ -16,7 +17,10 @@ class bot:
     server_url = Config.server_url
 
     def __init__ (self):
-        client = MongoClient()
+        mongo_ip = 'localhost'
+        if 'MONGODOCKERCOMPOSE_DB_1_PORT_27017_TCP_ADDR' in os.environ:
+            mongo_ip = os.environ['MONGODOCKERCOMPOSE_DB_1_PORT_27017_TCP_ADDR']
+        client = MongoClient(mongo_ip)
         db = client.emonitor
         self.db_settings = db.hovyubot_settings
         self.db_users = db.hovyubot_users
