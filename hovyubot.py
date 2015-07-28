@@ -30,7 +30,7 @@ class bot:
 
     def send_to_bot(self, access_point, data=None):
         try:
-            r = requests.get('https://api.telegram.org/bot{0}/{1}'.format(self.bot_token, access_point), data=data)
+            r = requests.get('https://api.telegram.org/bot{0}/{1}'.format(self.bot_token, access_point), data=data, timeout=40)
         except requests.exceptions.ConnectionError:
             print ("Connection Error")
             return None
@@ -38,7 +38,7 @@ class bot:
 
     def send_to_widu(self, access_point, data=None):
         try:
-            r = requests.get('{0}/{1}'.format(self.server_url, access_point), data=data)
+            r = requests.get('{0}/{1}'.format(self.server_url, access_point), data=data, timeout=40)
         except requests.exceptions.ConnectionError:
             print ("Connection Error")
             return None
@@ -87,8 +87,20 @@ class bot:
         infers = list(set(user_db['infers'] + infer))
         self.db_users.update({'_id': user_db['_id']}, {'$set': {'infers': infers}})
 
+
+
     def bot_loop(self):
         while 1:
+            # Send messages
+            users_db = self.db_users.find()
+            #for user in users_db:
+            #    data = {
+            #        'chat_id': user['tid'],
+            #        'text': 'Buenos días!',
+            #    }
+            #    r = self.send_to_bot('sendMessage', data = data)
+
+
             last_update = self.get_last_update()
             if last_update != 0:
                 last_update = last_update + 1

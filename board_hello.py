@@ -2,9 +2,11 @@ main = [
     'who_are_you',
     'what_is_hovyu',
     'what_is_sustainable',
+    'good_day',
     'where_cani_find_sustainable_stores',
     'i_know_a_sustainable_store',
-    'tell_me_more_about_sustainibility'
+    'tell_me_more_about_sustainibility',
+    'im_interested_on_sustainibility'
 ]
 
 more_sustainibility = [
@@ -19,12 +21,12 @@ board_hello = {
         {
             'name': 'good_day',
             'text': [['¡Buen día!'], ['¡Buenos dias!']],
-            'decoration': ['repeat_last_char'],
             'children': ['hello']
         },
         {
             'name': 'hello',
-            'text': [['¡Hola!']],
+            'text': [['¡Hola!'], ['¿Cómo andas?']],
+            'decoration': ['repeat_last_char'],
             'children': main
         },
         {
@@ -53,6 +55,14 @@ board_hello = {
             'infer': ['know_hovyu']
         },
         {
+            'name': 'im_interested_on_sustainibility',
+            'text': [['¡Me interesa la sostenibilidad!']],
+            'children': ['great'],
+            'if': ['know_hovyubot'],
+            'if_not': ['know_sustainability'],
+            'infer': ['know_sustainability']
+        },
+        {
             'name': 'what_is_sustainable',
             'text': [['¿Qué es sostenible?']],
             'children': ['sustainibility_is'],
@@ -74,7 +84,7 @@ board_hello = {
             'name': 'sustainibility_is',
             'text': [
                 [
-                    'Sostenibilidad (a veces llamado Sustentabilidad) conciste en satisfacer las necesidades de la actual generación sin sacrificar la capacidad de futuras generaciones de satisfacer sus propias necesidades.',
+                    'Sostenibilidad (a veces llamado Sustentabilidad) consiste en satisfacer las necesidades de la actual generación sin sacrificar la capacidad de futuras generaciones de satisfacer sus propias necesidades.',
                     'Sueno como Wikipedia! 😜'
                 ]
             ],
@@ -115,7 +125,7 @@ board_hello = {
             'name': 'i_understand',
             'text': [['¡Entendido!']],
             'children': ['great'],
-            'infer': ['know_sustainability']
+            #'infer': ['know_sustainability']
         },
         {
             'name': 'i_dont_understand_sustainibility',
@@ -141,7 +151,7 @@ board_hello = {
 
         {
             'name': 'tell_me_more_about_sustainibility',
-            'text': [['Cuéntame mas acerca de sostenibilidad']],
+            'text': [['Contame más acerca de sostenibilidad']],
             'children': ['more_sustainibility'],
             'if': ['know_sustainability']
         },
