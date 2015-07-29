@@ -16,7 +16,10 @@ class bot:
     bot_token = Config.bot_token
     server_url = Config.server_url
 
+    chats = {}
+
     emoji_oh = '😱'
+    emoji_silent = '😐'
 
     def __init__ (self):
         mongo_ip = 'localhost'
@@ -36,9 +39,9 @@ class bot:
             return None
         return r
 
-    def send_to_widu(self, access_point, data=None):
+    def send_to_widu(self, access_point, data=None, params=None):
         try:
-            r = requests.get('{0}/{1}'.format(self.server_url, access_point), data=data, timeout=40)
+            r = requests.get('{0}/{1}'.format(self.server_url, access_point), data=data, params=params, timeout=40)
         except requests.exceptions.ConnectionError:
             print ("Connection Error")
             return None
@@ -88,6 +91,84 @@ class bot:
         self.db_users.update({'_id': user_db['_id']}, {'$set': {'infers': infers}})
 
 
+    def search_place(self, name):
+        data = {
+            'find_places': name
+        }
+        items = self.send_to_widu('places', params=data)
+        #print (items)
+        place_items = []
+        if not items:
+            items = []
+        else:
+            items = items.json()['_items']
+        for item in items:
+            full_name = item['name']
+            city = item['is_in']['city']
+            state = item['is_in']['state']
+            country = item['is_in']['country']
+            if city:
+                full_name = "{0}, {1}".format(full_name, city)
+            if state:
+                full_name = "{0}, {1}".format(full_name, state)
+            if country:
+                full_name = "{0}, {1}".format(full_name, country)
+
+            if not city and not state and not country:
+                near_name = item['near_place']['name']
+                near_city = item['near_place']['city']
+                near_state = item['near_place']['state']
+                near_country = item['near_place']['country']
+                full_name = "{0} ({1}".format(full_name, near_name)
+                if near_city:
+                    full_name = "{0}, {1}".format(full_name, near_city)
+                if near_state:
+                    full_name = "{0}, {1}".format(full_name, near_state)
+                if near_country:
+                    full_name = "{0}, {1}".format(full_name, near_country)
+                full_name = "{0})".format(full_name)
+
+            osm_id = item['osm_id']
+            latitude = item['location']['coordinates'][0]
+            longitude = item['location']['coordinates'][1]
+
+            place_items.append({'_id': item['_id'],
+                                'name': item['name'],
+                                'full_name': full_name,
+                                'osm_id': osm_id,
+                                'latitude': latitude,
+                                'longitude': longitude})
+        return place_items
+
+    def get_stores(self, longitude=None, latitude=None, place=None):
+        if place:
+            r = self.send_to_widu('stores?product=&activity=&place_id={0}&page=1'.format(place))
+        else:
+            r = self.send_to_widu('stores?product=&activity=&latitude={0}&longitude={1}&page=1'.format(latitude, longitude))
+
+        stores = r.json()['_items']
+        if len(stores) == 0:
+            msg = 'Ahora no recuerdo ningún comercio verde por esa zona, pero si me llego a acordar te aviso! 😊'
+        else:
+            if len(stores) == 1:
+                msg = 'Sé de un comercio verde por tu zona:\n'
+            else:
+                msg = 'Sé de {0} comercios verdes por tu zona 😃\n'.format(len(stores))
+            for store in stores:
+                name = store['name']
+                description =  store['description']
+                address = store['address']
+                time_bike = ''
+                if store['distance_klm'] != None:
+                    distance_klm = store['distance_klm']
+                    if distance_klm < 1:
+                        time_bike = '{0} minutos a pie'.format(int(round(distance_klm*9)))
+                    else:
+                        time_bike = '{0} minutos en bicicleta'.format(int(round(180/distance_klm)))
+                if address == '':
+                    address = '(No recuerdo la dirección 😶, deberás preguntar en el barrio)'
+                msg = '{0}"{1}"\n{2}\n{3}\n{4}\n\n'.format(msg, name, description, address, time_bike)
+        return msg
 
     def bot_loop(self):
         while 1:
@@ -145,28 +226,7 @@ class bot:
                     if 'location' in message:
                         longitude = message['location']['longitude']
                         latitude = message['location']['latitude']
-                        r = self.send_to_widu('stores?product=&activity=&latitude={0}&longitude={1}&page=1'.format(latitude, longitude))
-                        #print (r.text)
-                        stores = r.json()['_items']
-                        if len(stores) == 0:
-                            msg = 'Ahora no recuerdo ningún comercio verde por esa zona, pero si me llego a acordar te aviso! 😊'
-                        else:
-                            if len(stores) == 1:
-                                msg = 'Sé de un comercio verde por tu zona:\n'
-                            else:
-                                msg = 'Sé de {0} comercios verdes por tu zona 😃\n'.format(len(stores))
-                            for store in stores:
-                                name = store['name']
-                                description =  store['description']
-                                address = store['address']
-                                distance_klm = store['distance_klm']
-                                if distance_klm < 1:
-                                    time_bike = '{0} minutos a pie'.format(int(round(distance_klm*9)))
-                                else:
-                                    time_bike = '{0} minutos en bicicleta'.format(int(round(180/distance_klm)))
-                                if address == '':
-                                    address = '(No recuerdo la dirección 😶, deberás preguntar en el barrio)'
-                                msg = '{0}"{1}"\n{2}\n{3}\n{4}\n\n'.format(msg, name, description, address, time_bike)
+                        msg = self.get_stores(longitude, latitude)
                         msgs.append([msg])
 
                     # Text
@@ -178,6 +238,45 @@ class bot:
                             text = text[1:]
                         elif text[0:9] == '@HovyuBot ':
                             text = text[10:]
+
+                        # Action
+                        action = True
+                        try:
+                            option = int(text)
+                        except:
+                            action = False
+                        if action:
+                            if chat_id in self.chats and option in self.chats[chat_id]['options']:
+                                place_id = self.chats[chat_id]['options'][option]
+                                #print (place_id)
+                                msg = self.get_stores(place = place_id)
+                                msgs.append([msg])
+                            else:
+                                msgs.append(['No conozco esa opción... {1}'.format(self.emoji_silent)])
+
+                        # Zone
+                        if text[0:5] == 'zona ':
+                            text = text[6:]
+                            places = self.search_place(text)
+                            if len(places) > 0:
+                                places_names = ''
+                                place_number = 0
+                                options = {}
+                                for place in places:
+                                    places_names = '{0}\n{1}. {2}'.format(places_names, place_number, place['full_name'])
+                                    options[place_number] = place['_id']
+                                    place_number += 1
+                                self.chats[chat_id] = {'action': 'zone', 'options': options}
+                                msgs.append([places_names])
+                                if len(places) == 1:
+                                    msg = self.get_stores(place = places[0]['_id'])
+                                    msgs.append([msg])
+                                else:
+                                    msgs.append(['Escribí el número del lugar donde querés que busque'])
+                            else:
+                                msgs.append(['No conozco ese lugar... ¿Está bien escrito?'])
+
+                        # Dialog
                         for node in board_hello['nodes']:
                             for node_text in node['text']:
                                 if [text] == node_text:
