@@ -19,7 +19,7 @@ class bot:
     chats = {}
 
     emoji_oh = '😱'
-    emoji_silent = '😐'
+    emoji_silent = '😁'
 
     def __init__ (self):
         mongo_ip = 'localhost'
@@ -140,7 +140,21 @@ class bot:
                                 'longitude': longitude})
         return place_items
 
-    def get_stores(self, longitude=None, latitude=None, place=None):
+    def search_product(self, name):
+        data = {
+            'find_products': name
+        }
+        items = self.send_to_widu('products', params=data)
+        products_items = []
+        if not items:
+            items = []
+        else:
+            items = items.json()['_items']
+        for item in items:
+            products_items.append({'_id': item['_id'], 'name': item['name']})
+        return products_items
+
+    def get_stores(self, product='', longitude=None, latitude=None, place=None):
         if place:
             r = self.send_to_widu('stores?product=&activity=&place_id={0}&page=1'.format(place))
         else:
@@ -226,8 +240,13 @@ class bot:
                     if 'location' in message:
                         longitude = message['location']['longitude']
                         latitude = message['location']['latitude']
-                        msg = self.get_stores(longitude, latitude)
+                        msg = self.get_stores(longitude=longitude, latitude=latitude)
                         msgs.append([msg])
+                        if not chat_id in self.chats:
+                            self.chats[chat_id] = {}
+                        self.chats[chat_id]['longitude'] = longitude
+                        self.chats[chat_id]['latitude'] = latitude
+                        msgs.append(['Si querés buscar un producto en particular escribí "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
 
                     # Text
                     if 'text' in message:
@@ -247,16 +266,30 @@ class bot:
                             action = False
                         if action:
                             if chat_id in self.chats and option in self.chats[chat_id]['options']:
-                                place_id = self.chats[chat_id]['options'][option]
-                                #print (place_id)
-                                msg = self.get_stores(place = place_id)
-                                msgs.append([msg])
+                                if self.chats[chat_id]['action'] == 'zone':
+                                    place_id = self.chats[chat_id]['options'][option]
+                                    self.chats[chat_id]['place'] = place_id
+                                    msg = self.get_stores(place = place_id)
+                                    msgs.append([msg])
+                                    msgs.append(['Si querés buscar un producto en particular escribí "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
+                                elif self.chats[chat_id]['action'] == 'product':
+                                    #print (self.chats[chat_id])
+                                    if 'place' in self.chats[chat_id] or 'longitude' in self.chats[chat_id]:
+                                        product_id = self.chats[chat_id]['options'][option]
+                                        place_id = self.chats[chat_id].get('place', '')
+                                        longitude = self.chats[chat_id].get('longitude')
+                                        latitude = self.chats[chat_id].get('latitude')
+                                        msg = self.get_stores(product=product_id, place = place_id, longitude=longitude, latitude=latitude)
+                                        msgs.append([msg])
+                                    else:
+                                        msgs.append(['No medijiste donde querés buscar'])
+                                        msgs.append(['Enviame tu ubicación o escribí "zona" y el nombre de tu ciudad, por ejemplo "zona Bahía Blanca"'])
                             else:
-                                msgs.append(['No conozco esa opción... {1}'.format(self.emoji_silent)])
+                                msgs.append(['No conozco esa opción... {0}'.format(self.emoji_silent)])
 
                         # Zone
                         if text[0:5] == 'zona ':
-                            text = text[6:]
+                            text = text[5:]
                             places = self.search_place(text)
                             if len(places) > 0:
                                 places_names = ''
@@ -266,15 +299,49 @@ class bot:
                                     places_names = '{0}\n{1}. {2}'.format(places_names, place_number, place['full_name'])
                                     options[place_number] = place['_id']
                                     place_number += 1
-                                self.chats[chat_id] = {'action': 'zone', 'options': options}
+                                if not chat_id in self.chats:
+                                    self.chats[chat_id] = {}
+                                self.chats[chat_id]['action'] = 'zone'
+                                self.chats[chat_id]['options'] = options
                                 msgs.append([places_names])
                                 if len(places) == 1:
                                     msg = self.get_stores(place = places[0]['_id'])
                                     msgs.append([msg])
+                                    msgs.append(['Si querés buscar un producto en particular escribí "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
                                 else:
                                     msgs.append(['Escribí el número del lugar donde querés que busque'])
                             else:
                                 msgs.append(['No conozco ese lugar... ¿Está bien escrito?'])
+
+                        # Product
+                        if text[0:9] == 'producto ':
+                            if chat_id in self.chats and ('place' in self.chats[chat_id] or ('latitude' in self.chats[chat_id])):
+                                text = text[9:]
+                                products = self.search_product(text)
+                                if len(products) > 0:
+                                    products_names = ''
+                                    product_number = 0
+                                    options = {}
+                                    for product in products:
+                                        products_names = '{0}\n{1}. {2}'.format(products_names, product_number, product['name'])
+                                        options[product_number] = product['_id']
+                                        product_number += 1
+                                    if not chat_id in self.chats:
+                                        self.chats[chat_id] = {}
+                                    self.chats[chat_id]['action'] = 'product'
+                                    self.chats[chat_id]['options'] = options
+                                    msgs.append([products_names])
+                                    if len(products) == 1:
+                                        #msg = self.get_stores(place = places[0]['_id'])
+                                        #msgs.append([msg])
+                                        pass
+                                    else:
+                                        msgs.append(['Escribí el número del producto donde querés que busque'])
+                                else:
+                                    msgs.append(['No conozco ese producto... ¿Está bien escrito?'])
+                            else:
+                                msgs.append(['No medijiste donde querés buscar'])
+                                msgs.append(['Enviame tu ubicación o escribí "zona" y el nombre de tu ciudad, por ejemplo "zona Bahía Blanca"'])
 
                         # Dialog
                         for node in board_hello['nodes']:
