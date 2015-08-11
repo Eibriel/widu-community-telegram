@@ -188,7 +188,7 @@ board_hello = {
         {
             'name': 'we_need_to_change',
             'text': [['Necesitamos entender que el dinero no tiene ningún valor',
-                'los humanos no necesitamos dinero para vivir, necesitan recursos.']],
+                'los humanos no necesitamos dinero para vivir, necesitamos recursos.']],
             'children': ['we_need_money_to_buy_stuff', 'we_can_talk_later']
         },
         {
@@ -197,10 +197,10 @@ board_hello = {
             'children': ['millonarie_island']
         },
         {
-            'name': 'millonatie_island',
+            'name': 'millonarie_island',
             'text': [['Imagínate que tienes una maleta con mucho dinero',
                 'pero estás en una isla solitaria, sin frutos, peces, ni agua.',
-                '¡El dinero no sirve de nada!']],
+                '¡El dinero no sirve de nada! Y la pobreza no se resuelve repartiendo dinero.']],
             'children': more_sustainibility
         },
 
