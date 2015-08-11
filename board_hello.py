@@ -31,7 +31,7 @@ board_hello = {
         },
         {
             'name': 'who_are_you',
-            'text': [['¿Quién sos?']],
+            'text': [['¿Quién eres?']],
             'children': ['i_am_hovyu'],
             'if_not': ['know_hovyubot']
         },
@@ -44,7 +44,7 @@ board_hello = {
         },
         {
             'name': 'i_am_hovyu',
-            'text': [['Soy Hovyũ, un bot verde', 'me interesa la sostenibilidad', 'si a vos también te interesa podemos charlar!']],
+            'text': [['Soy Hovyũ, un bot verde', 'me interesa la vida consciente', 'si a vos también te interesa podemos charlar!']],
             'children': main,
             'infer': ['know_hovyubot']
         },
@@ -56,7 +56,7 @@ board_hello = {
         },
         {
             'name': 'im_interested_on_sustainibility',
-            'text': [['¡Me interesa la sostenibilidad!']],
+            'text': [['¡Me interesa la vida consciente!']],
             'children': ['great'],
             'if': ['know_hovyubot'],
             'if_not': ['know_sustainability'],
@@ -101,7 +101,7 @@ board_hello = {
             'name': 'send_me_your_location_and_i_tell_you_green_stores_in_the_zone',
             'text': [
                 [
-                    'Enviame tu ubicación, o escribe "zona NombreCiudad" y te digo que comercios verdes hay por tu zona. Por ejemplo "zona Bahía Blanca".'
+                    'Envíame tu ubicación, o escribe "zona NombreCiudad" y te diré que comercios verdes hay por tu zona. Por ejemplo "zona Bahía Blanca".'
                 ]
             ],
             'children': ['i_understand_sustainibility']
@@ -110,7 +110,7 @@ board_hello = {
             'name': 'great_join_the_group_and_comment_it',
             'text': [
                 [
-                    'Genial! Unite al grupo https://telegram.me/joinchat/0338811e00225f1561463d99065a12d7 y comentalo!'
+                    'Genial! Unete al grupo https://telegram.me/joinchat/0338811e00225f1561463d99065a12d7 y comentalo!'
                 ]
             ],
             'children': ['i_understand']
@@ -151,7 +151,7 @@ board_hello = {
 
         {
             'name': 'tell_me_more_about_sustainibility',
-            'text': [['Contame más acerca de sostenibilidad']],
+            'text': [['Cuéntame más acerca de sostenibilidad']],
             'children': ['more_sustainibility'],
             'if': ['know_sustainability']
         },

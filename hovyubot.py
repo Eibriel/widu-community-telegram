@@ -162,7 +162,8 @@ class bot:
 
         stores = r.json()['_items']
         if len(stores) == 0:
-            msg = 'Ahora no recuerdo ningún comercio verde por esa zona, pero si me llego a acordar te aviso! 😊'
+            msg = '''Ahora no recuerdo ningún comercio verde por esa zona, pero si me llego a acordar te aviso! 😊'
+Mientras tanto puede unirte al grupo https://telegram.me/joinchat/0338811e00225f1561463d99065a12d7 para debatir y dejar comentarios'''
         else:
             if len(stores) == 1:
                 msg = 'Sé de un comercio verde por tu zona:\n'
@@ -246,7 +247,7 @@ class bot:
                             self.chats[chat_id] = {}
                         self.chats[chat_id]['longitude'] = longitude
                         self.chats[chat_id]['latitude'] = latitude
-                        msgs.append(['Si querés buscar un producto en particular escribí "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
+                        msgs.append(['Si quieres buscar un producto en particular escribe "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
 
                     # Text
                     if 'text' in message:
@@ -271,7 +272,7 @@ class bot:
                                     self.chats[chat_id]['place'] = place_id
                                     msg = self.get_stores(place = place_id)
                                     msgs.append([msg])
-                                    msgs.append(['Si querés buscar un producto en particular escribí "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
+                                    msgs.append(['Si quieres buscar un producto en particular escribe "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
                                 elif self.chats[chat_id]['action'] == 'product':
                                     #print (self.chats[chat_id])
                                     if 'place' in self.chats[chat_id] or 'longitude' in self.chats[chat_id]:
@@ -282,8 +283,8 @@ class bot:
                                         msg = self.get_stores(product=product_id, place = place_id, longitude=longitude, latitude=latitude)
                                         msgs.append([msg])
                                     else:
-                                        msgs.append(['No medijiste donde querés buscar'])
-                                        msgs.append(['Enviame tu ubicación o escribí "zona" y el nombre de tu ciudad, por ejemplo "zona Bahía Blanca"'])
+                                        msgs.append(['No me indicaste donde quieres buscar'])
+                                        msgs.append(['Envíame tu ubicación o escribe "zona" y el nombre de tu ciudad, por ejemplo "zona Bahía Blanca"'])
                             else:
                                 msgs.append(['No conozco esa opción... {0}'.format(self.emoji_silent)])
 
@@ -307,9 +308,9 @@ class bot:
                                 if len(places) == 1:
                                     msg = self.get_stores(place = places[0]['_id'])
                                     msgs.append([msg])
-                                    msgs.append(['Si querés buscar un producto en particular escribí "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
+                                    msgs.append(['Si quieres buscar un producto en particular escribe "producto" y el nombre del producto, por ejemplo "producto milanesa".'])
                                 else:
-                                    msgs.append(['Escribí el número del lugar donde querés que busque'])
+                                    msgs.append(['Escribe el número del lugar donde quieres que busque'])
                             else:
                                 msgs.append(['No conozco ese lugar... ¿Está bien escrito?'])
 
@@ -340,8 +341,8 @@ class bot:
                                 else:
                                     msgs.append(['No conozco ese producto... ¿Está bien escrito?'])
                             else:
-                                msgs.append(['No medijiste donde querés buscar'])
-                                msgs.append(['Enviame tu ubicación o escribí "zona" y el nombre de tu ciudad, por ejemplo "zona Bahía Blanca"'])
+                                msgs.append(['No me indicaste donde quieres buscar'])
+                                msgs.append(['Envíame tu ubicación o escribe "zona" y el nombre de tu ciudad, por ejemplo "zona Bahía Blanca"'])
 
                         # Dialog
                         for node in board_hello['nodes']:
