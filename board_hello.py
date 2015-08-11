@@ -11,6 +11,7 @@ main = [
 
 more_sustainibility = [
     'but_the_world_is_full_of_resources',
+    'what_needs_change',
     'we_can_talk_later'
 ]
 
@@ -178,7 +179,30 @@ board_hello = {
             'text': [['Pero si se derrochan se van a terminar antes de que puedan recuperarse naturalmente',
                 'de hecho actualmente en el mundo se consume en 6 meses los recursos de 1 año.']],
             'children': more_sustainibility
-        }
+        },
+        {
+            'name': 'what_needs_change',
+            'text': [['Qué cosas hacen falta cambiar?']],
+            'children': ['we_need_to_change']
+        },
+        {
+            'name': 'we_need_to_change',
+            'text': [['Necesitamos entender que el dinero no tiene ningún valor',
+                'los humanos no necesitamos dinero para vivir, necesitan recursos.']],
+            'children': ['we_need_money_to_buy_stuff', 'we_can_talk_later']
+        },
+        {
+            'name': 'we_need_money_to_buy_stuff',
+            'text': [['Necesitamos dinero para comer!']],
+            'children': ['millonarie_island']
+        },
+        {
+            'name': 'millonatie_island',
+            'text': [['Imagínate que tienes una maleta con mucho dinero',
+                'pero estás en una isla solitaria, sin frutos, peces, ni agua.',
+                '¡El dinero no sirve de nada!']],
+            'children': more_sustainibility
+        },
 
     ]
 }
